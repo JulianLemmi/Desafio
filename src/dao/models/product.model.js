@@ -1,39 +1,43 @@
-import mongoose from "mongoose"; // Importa el módulo mongoose
+import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
-// Define el nombre de la colección en la base de datos
 const productCollection = "products";
 
-// Define el esquema para los documentos de la colección 'products'
 const productSchema = new mongoose.Schema({
   title: {
-    type: String,    // El campo 'title' es de tipo cadena
-    require: true,   // El campo 'title' es obligatorio
+    type: String,
+    require: true,
   },
   description: {
-    type: String,    // El campo 'description' es de tipo cadena
-    require: true,   // El campo 'description' es obligatorio
+    type: String,
+    require: true,
   },
   thumbnail: {
-    type: Array,     // El campo 'thumbnail' es de tipo array
-    default: [],     // El valor por defecto de 'thumbnail' es un array vacío
+    type: Array,
+    default: [],
   },
   code: {
-    type: String,    // El campo 'code' es de tipo cadena
-    require: true,   // El campo 'code' es obligatorio
+    type: String,
+    require: true,
   },
   stock: {
-    type: Number,    // El campo 'stock' es de tipo número
-    require: true,   // El campo 'stock' es obligatorio
+    type: Number,
+    require: true,
   },
   status: {
-    type: Boolean,   // El campo 'status' es de tipo booleano
-    default: true,   // El valor por defecto de 'status' es true
+    type: Boolean,
+    default: true,
   },
   price: {
-    type: Number,    // El campo 'price' es de tipo número
-    require: true,   // El campo 'price' es obligatorio
+    type: Number,
+    require: true,
   },
+  category: {
+    type: String,
+    require: true
+  }
 });
 
-// Crea un modelo de Mongoose basado en el esquema definido y la colección especificada
+productSchema.plugin(mongoosePaginate);
+
 export const productModel = mongoose.model(productCollection, productSchema);

@@ -1,85 +1,63 @@
-import fs from "fs";
+import fs from "fs";  // Importa el módulo fs para trabajar con el sistema de archivos
 
-// Ruta del archivo JSON donde se almacenan los carritos
-const pathFile = "./src/data/carts.json";
-let carts = [];
+let carts = [];  // Array para almacenar los carritos
+const pathFile = "./src/data/carts.json";  // Ruta del archivo donde se almacenan los carritos
 
-// Función asincrónica para obtener los datos de los carritos desde el archivo
+// Función para obtener todos los carritos
 const getCarts = async () => {
-  try {
-    const cartsJson = await fs.promises.readFile(pathFile);
-    carts = JSON.parse(cartsJson) || [];
-  } catch (error) {
-    console.error("Error al obtener los datos de los carritos:", error);
-  }
+  const cartsJson = await fs.promises.readFile(pathFile);  // Lee el archivo de carritos
+  carts = JSON.parse(cartsJson) || [];  // Parsea el contenido del archivo y lo asigna a la variable carts
 
-  return carts;
+  return carts;  // Devuelve la lista de carritos
 };
 
-// Función asincrónica para crear un nuevo carrito
+// Función para crear un nuevo carrito
 const createCart = async () => {
-  try {
-    await getCarts();
+  await getCarts();  // Carga los carritos existentes
 
-    // Crear un nuevo carrito con un ID único y sin productos inicialmente
-    const newCart = {
-      id: carts.length + 1,
-      products: []
-    };
+  const newCart = {
+    id: carts.length + 1,  // Asigna un ID al nuevo carrito
+    products: []  // Inicializa el carrito con un array de productos vacío
+  };
 
-    // Agregar el nuevo carrito a la lista de carritos
-    carts.push(newCart);
+  carts.push(newCart);  // Agrega el nuevo carrito al array de carritos
 
-    // Guardar la lista actualizada de carritos en el archivo JSON
-    await fs.promises.writeFile(pathFile, JSON.stringify(carts));
+  // Guarda los carritos actualizados en el archivo
+  await fs.promises.writeFile(pathFile, JSON.stringify(carts));
 
-    return newCart;
-  } catch (error) {
-    console.error("Error al crear un nuevo carrito:", error);
-    throw error;
-  }
+  return newCart;  // Devuelve el carrito creado
 };
 
-// Función asincrónica para obtener un carrito por su ID
+// Función para obtener los productos de un carrito por su ID
 const getCartById = async (cid) => {
-  try {
-    await getCarts();
+  await getCarts();  // Carga los carritos existentes
+  
+  const cart = carts.find(c => c.id === cid);  // Busca el carrito por su ID
 
-    // Buscar el carrito por su ID
-    const cart = carts.find((c) => c.id === cid);
+  if (!cart) return `No se encuentra el carrito con el id ${cid}`;  // Si no se encuentra el carrito, devuelve un mensaje de error
 
-    if (!cart) return `No se encuentra el carrito con el ID ${cid}`;
-
-    return cart.products;
-  } catch (error) {
-    console.error("Error al obtener el carrito por su ID:", error);
-    throw error;
-  }
+  return cart.products;  // Devuelve los productos del carrito encontrado
 };
 
-// Función asincrónica para agregar un producto a un carrito existente
+// Función para agregar un producto a un carrito por su ID
 const addProductToCart = async (cid, pid) => {
-  try {
-    await getCarts();
+  await getCarts();  // Carga los carritos existentes
+  
+  const index = carts.findIndex(c => c.id === cid);  // Encuentra el índice del carrito
+  if (index === -1) return `No se encontró el carrito con el id ${cid}`;  // Si no se encuentra el carrito, devuelve un mensaje de error
 
-    // Buscar el índice del carrito en la lista de carritos
-    const index = carts.findIndex((c) => c.id === cid);
-    if (index === -1) return `No se encontró el carrito con el ID ${cid}`;
+  carts[index].products.push({
+    product: pid,  // Agrega el ID del producto
+    quantity: 1  // Establece la cantidad del producto a 1
+  });
 
-    // Agregar el producto al carrito especificado con una cantidad inicial de 1
-    carts[index].products.push({
-      product: pid,
-      quantity: 1
-    });
+  // Guarda los carritos actualizados en el archivo
+  await fs.promises.writeFile(pathFile, JSON.stringify(carts));
 
-    return carts[index];
-  } catch (error) {
-    console.error("Error al agregar un producto al carrito:", error);
-    throw error;
-  }
+  return carts[index];  // Devuelve el carrito actualizado
 };
 
-// Exportar las funciones para su uso en otros módulos
+// Exporta todas las funciones para que puedan ser utilizadas en otras partes de la aplicación
 export default {
   getCarts,
   createCart,
